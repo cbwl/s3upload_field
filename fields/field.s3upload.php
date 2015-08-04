@@ -489,14 +489,26 @@ class FieldS3Upload extends FieldUpload
     {
         if(!$file = $data['file']) return NULL;
 
-        if($link){
-            $link->setValue(basename($file));
-            return $link->generate();
-        }
+        $destination = $this->getUrl($file);
 
-        else{
-            $link = Widget::Anchor($this->getUrl($file),$this->getUrl($file));
-            return $link->generate();
+        if (preg_match('/\.(?:gif|bmp|jpe?g|png)$/i', $destination)) {
+            // If we have an image file, use a thumbnail instead
+            $dest_no_protocol = preg_replace('/^https?:\/\//', '', $destination);
+            $src = URL . '/image/externalthumb/' . $dest_no_protocol;
+            $image = '<img style="vertical-align: middle; max-height: 40px; max-width: 40px" src="' . $src . '" alt="Thumbnail of Entry ' . $entry_id . '"/>';
+            if ($link) {
+                $link->setValue($image);
+            } else {
+                $link = Widget::Anchor($image, $destination);
+            }
+        } else {
+            // Otherwise use the filename as the link text
+            if ($link) {
+                $link->setValue(basename($file));
+            } else {
+                $link = Widget::Anchor($destination, $destination);
+            }
         }
+        return $link->generate();
     }
 }

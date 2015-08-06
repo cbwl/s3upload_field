@@ -18,7 +18,8 @@ class S3Facade
     {
         $this->s3 = S3Client::factory(array(
             'key' => $accessKey,
-            'secret' => $secretKey
+            'secret' => $secretKey,
+            'region' => 'eu-west-1'
         ));
     }
 
